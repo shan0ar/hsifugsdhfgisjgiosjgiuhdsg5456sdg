@@ -9,7 +9,7 @@
 #  Ce script est AUTOSUFFISANT : il n'appelle aucun autre script externe.
 #  Il couvre :
 #    1. Mise à jour système complète
-#    2. Création des comptes auditeurs (thomas_stephan, mathieu_clair)
+#    2. Création des comptes auditeurs (thomas, mathieu)
 #    3. Restriction des accès système
 #    4. Installation de tous les outils pentest (externe + interne)
 #    5. Durcissement complet (UFW, sysctl, SSH, auditd, Nessus localhost)
@@ -32,7 +32,7 @@ GITHUB_DIR="$TOOLS_DIR/github"
 WORDLIST_DIR="/opt/wordlists"
 
 # ── Comptes auditeurs ─────────────────────────────────────────────────────────
-AUDITORS=("thomas_stephan" "mathieu_clair")
+AUDITORS=("thomas" "mathieu")
 # Hash SHA-512 de HQS_2026!  (généré avec openssl passwd -6)
 PASS_HASH='$6$R14MdYqQz9q3bMSN$UcgxZK57YjqISOtEp9x7HuIxHqV.5236ngLU5aPhNROfo76HpEgjQ66onqwR6i0iUjBzNqnv5N7Jb1idHSQB00'
 
@@ -221,12 +221,12 @@ cat > /etc/security/access.conf << 'ACCESSCONF'
 # root toujours autorisé (première connexion pour activer les comptes)
 # Comptes auditeurs autorisés une fois déverrouillés par root
 + : root           : ALL
-+ : thomas_stephan : ALL
-+ : mathieu_clair  : ALL
++ : thomas : ALL
++ : mathieu  : ALL
 + : auditeur       : ALL
 - : ALL            : ALL
 ACCESSCONF
-log_ok "PAM access.conf configuré (comptes autorisés: thomas_stephan, mathieu_clair)"
+log_ok "PAM access.conf configuré (comptes autorisés: thomas, mathieu)"
 
 # Activer pam_access dans les modules PAM concernés
 for pam_file in /etc/pam.d/login /etc/pam.d/sshd /etc/pam.d/su; do
@@ -450,7 +450,7 @@ log_step "Installation et configuration Nessus"
 NESSUS_DEB="Nessus-10.11.2-ubuntu1604_amd64.deb"
 NESSUS_URL="https://www.tenable.com/downloads/api/v2/pages/nessus/files/${NESSUS_DEB}"
 NESSUS_KEY="W2HD-EW8E-BCTZ-JPST"
-NESSUS_ADMIN_USER="thomas_stephan"
+NESSUS_ADMIN_USER="thomas"
 NESSUS_ADMIN_PASS="HQS_2026!"
 
 log_info "Téléchargement Nessus..."
@@ -634,7 +634,7 @@ if [[ -f "$SSH_CONF" ]]; then
     sed -i 's/^#*Port .*/Port 2222/'                                    "$SSH_CONF"
     grep -q "^MaxAuthTries"    "$SSH_CONF" || echo "MaxAuthTries 3"    >> "$SSH_CONF"
     grep -q "^LoginGraceTime"  "$SSH_CONF" || echo "LoginGraceTime 30" >> "$SSH_CONF"
-    grep -q "^AllowUsers"      "$SSH_CONF" || echo "AllowUsers thomas_stephan mathieu_clair" >> "$SSH_CONF"
+    grep -q "^AllowUsers"      "$SSH_CONF" || echo "AllowUsers thomas mathieu" >> "$SSH_CONF"
 fi
 # SSH désactivé par défaut entre les missions
 systemctl disable ssh 2>/dev/null || true
@@ -722,11 +722,11 @@ echo "  ╔═══════════════════════
 echo "  ║         HELIAQ — Première connexion root             ║"
 echo "  ╠══════════════════════════════════════════════════════╣"
 echo "  ║  Comptes disponibles (tous verrouillés) :            ║"
-echo "  ║    thomas_stephan / mathieu_clair / auditeur         ║"
+echo "  ║    thomas / mathieu / auditeur         ║"
 echo "  ║                                                      ║"
 echo "  ║  Pour activer un compte :                            ║"
-echo "  ║    passwd thomas_stephan                             ║"
-echo "  ║    passwd mathieu_clair                              ║"
+echo "  ║    passwd thomas                             ║"
+echo "  ║    passwd mathieu                              ║"
 echo "  ║    passwd auditeur                                   ║"
 echo "  ║                                                      ║"
 echo "  ║  Pour verrouiller root ensuite :                     ║"
@@ -795,7 +795,7 @@ echo "  SETUP HELIAQ TERMINÉ — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "============================================================"
 echo ""
 echo "  COMPTES CRÉÉS :"
-echo "    thomas_stephan  / mathieu_clair  (sudo, mot de passe : HQS_2026!)"
+echo "    thomas  / mathieu  (sudo, mot de passe : HQS_2026!)"
 echo "    Compte kali par défaut : VERROUILLÉ"
 echo "    root : VERROUILLÉ (accès via sudo)"
 echo ""
